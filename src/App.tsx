@@ -4,14 +4,53 @@ import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
 const Container = styled.div`
-  display: flex;
+  /* display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
   font-size: 24px;
-  background-color: #f0f4f8; /* 背景色を変更 */
+  background-color: #f0f4f8; /* 背景色を変更 
+  padding: 20px; */
+  display: flex;
+  height: 100vh;
+`;
+
+const LeftSide = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f4f8;
   padding: 20px;
+`;
+
+const Center = styled.div`
+  background-color: #f0f4f8;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
+
+const RightSide = styled.div`
+  background-color: #f0f4f8;
+  flex: 1;
+`;
+
+const TextInput = styled.textarea`
+  width: 80%;
+  height: 30px; /* 1行分のサイズ */
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: none;
+  box-shadow: inset 5px 5px 10px #cfcfcf, inset -5px -5px 10px #fff;
+  resize: none;
+  background-color: #f0f4f8;
+  color: #333;
 `;
 
 const ButtonArea = styled.div`
@@ -133,36 +172,43 @@ const App: React.FC = () => {
   //JSX記法
   return (
     <Container>
-      <div>Hello World</div>
-      <CircleContainer>
-        {/* 
+      <LeftSide>
+        <h2>Text Input Area</h2>
+        <TextInput placeholder="Type something here..." />
+      </LeftSide>
+      <Center>
+        <div>Hello World</div>
+        <CircleContainer>
+          {/* 
         CircularProgressbar: react-circular-progressbarライブラリからのコンポーネントで、円形プログレスバーを表示。
         value={percentage}: プログレスバーの進捗をpercentageで設定。
         text={${(10 - percentage / 10).toFixed(0)}s}: 残り秒数をテキストとして表示。
         styles: プログレスバーの見た目をカスタマイズ。
         */}
-        <CircularProgressbar
-          value={percentage}
-          text={`${(10 - percentage / 10).toFixed(0)}s`}
-          styles={buildStyles({
-            pathTransitionDuration: 0.15,
-            textColor: "#000",
-            pathColor: `rgba(62, 152, 199, ${percentage / 100})`,
-            trailColor: "#d6d6d6",
-          })}
-        />
-      </CircleContainer>
-      <ButtonArea>
-        <Button onClick={startTimer}>Start</Button>
-        <Button onClick={stopTimer}>Stop</Button>
-      </ButtonArea>
-      <TimeDisplay>{formatTime(elapsedTime)}</TimeDisplay>
-      <TimestampDisplay>
-        Start Time: {startTimestamp || "Not started yet"}
-      </TimestampDisplay>
-      <TimestampDisplay>
-        Stop Time: {stopTimestamp || "Not stopped yet"}
-      </TimestampDisplay>
+          <CircularProgressbar
+            value={percentage}
+            text={`${(10 - percentage / 10).toFixed(0)}s`}
+            styles={buildStyles({
+              pathTransitionDuration: 0.15,
+              textColor: "#000",
+              pathColor: `rgba(62, 152, 199, ${percentage / 100})`,
+              trailColor: "#d6d6d6",
+            })}
+          />
+        </CircleContainer>
+        <ButtonArea>
+          <Button onClick={startTimer}>Start</Button>
+          <Button onClick={stopTimer}>Stop</Button>
+        </ButtonArea>
+        <TimeDisplay>{formatTime(elapsedTime)}</TimeDisplay>
+        <TimestampDisplay>
+          Start Time: {startTimestamp || "Not started yet"}
+        </TimestampDisplay>
+        <TimestampDisplay>
+          Stop Time: {stopTimestamp || "Not stopped yet"}
+        </TimestampDisplay>
+      </Center>
+      <RightSide />
     </Container>
   );
 };
