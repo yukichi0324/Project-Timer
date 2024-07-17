@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
-import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
+import React, { useState, useEffect, useRef } from 'react';
+import styled from 'styled-components';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
 const Container = styled.div`
   display: flex;
@@ -47,14 +47,18 @@ const CircleContainer = styled.div`
   margin-top: 20px;
 `;
 
+const TimeDisplay = styled.div`
+  font-size: 24px;
+  margin-top: 20px;
+`;
+
 //FC:Functional Component
 const App: React.FC = () => {
   //percentage: 現在の進捗
   //setPercentage: 進捗更新
   //useState: Reactのフック、状態管理で使用
   const [percentage, setPercentage] = useState(0);
-  console.log('percentage',percentage);
-  console.log('UseState',useState)
+  // console.log("percentage", percentage);
 
   //useEffect: Reactのフック、コンポーネントが表示された時や更新された時に実行したい処理を定義
   //コンポーネントが表示された後にタイマーを設定し、一定間隔でpercentageを更新
@@ -70,6 +74,42 @@ const App: React.FC = () => {
     //ンポーネントが消えるときに、setIntervalで設定したタイマーを解除するための関数を返す
     return () => clearInterval(interval);
   }, []);
+  
+  //isRunning: ストップウォッチが動いているかどうか
+  const [isRunning, setIsRunning] = useState(false);
+  //elapsedTime: 経過時間(秒)
+  const [elapsedTime, setElapsedTime] = useState(0);
+  //timerRef: timerIDを保持
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+
+  const startTimer = () => {
+    if (!isRunning) {
+      setIsRunning(true);
+      timerRef.current = setInterval(() => {
+        setElapsedTime((prev) => prev + 1);
+      }, 1000);
+    }
+  };
+
+  const stopTimer = () => {
+    if (isRunning) {
+      setIsRunning(false);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+  };
+  
+  const formatTime = (time: number) => {
+    const getSeconds = `0${time % 60}`.slice(-2);
+    const minutes = Math.floor(time / 60);
+    const getMinutes = `0${minutes % 60}`.slice(-2);
+    const getHours = `0${Math.floor(time / 3600)}`.slice(-2);
+    return `${getHours}:${getMinutes}:${getSeconds}`;
+  };
+  
 
   //JSX記法
   return (
@@ -94,9 +134,10 @@ const App: React.FC = () => {
         />
       </CircleContainer>
       <ButtonArea>
-        <Button>Button 1</Button>
-        <Button>Button 2</Button>
+        <Button onClick={startTimer}>Start</Button>
+        <Button onClick={stopTimer}>Stop</Button>
       </ButtonArea>
+      <TimeDisplay>{formatTime(elapsedTime)}</TimeDisplay>
     </Container>
   );
 };
