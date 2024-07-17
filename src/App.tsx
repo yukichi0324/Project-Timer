@@ -96,6 +96,22 @@ const TimestampDisplay = styled.div`
   margin-top: 10px;
 `;
 
+const TaskList = styled.ul`
+  list-style-type: none;
+  padding: 0;
+  font-size: 18px;
+  color: #333;
+`;
+
+const TaskListItem = styled.li`
+  margin: 10px 0;
+  box-shadow: 5px 5px 10px #cbced1, -5px -5px 10px #fff;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+`;
+
+
 //FC:Functional Component
 const App: React.FC = () => {
   //percentage: 現在の進捗
@@ -169,12 +185,22 @@ const App: React.FC = () => {
     return `${getHours}:${getMinutes}:${getSeconds}`;
   };
 
+  const Checkbox = styled.input.attrs({ type: 'checkbox' })`
+  margin-right: 10px;
+`;
+
   //JSX記法
   return (
     <Container>
       <LeftSide>
         <h2>Text Input Area</h2>
         <TextInput placeholder="Type something here..." />
+        <TaskList>
+          <TaskListItem> <Checkbox />仕様書を書く</TaskListItem>
+          <TaskListItem> <Checkbox />ミーティング</TaskListItem>
+          <TaskListItem> <Checkbox />不具合No.10修正</TaskListItem>
+          <TaskListItem> <Checkbox />テスト環境構築</TaskListItem>
+        </TaskList>
       </LeftSide>
       <Center>
         <div>Hello World</div>
