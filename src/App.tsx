@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import styled from 'styled-components';
-import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
-import 'react-circular-progressbar/dist/styles.css';
+import React, { useState, useEffect, useRef } from "react";
+import styled from "styled-components";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 
 const Container = styled.div`
   display: flex;
@@ -52,6 +52,11 @@ const TimeDisplay = styled.div`
   margin-top: 20px;
 `;
 
+const TimestampDisplay = styled.div`
+  font-size: 18px;
+  margin-top: 10px;
+`;
+
 //FC:Functional Component
 const App: React.FC = () => {
   //percentage: 現在の進捗
@@ -74,7 +79,7 @@ const App: React.FC = () => {
     //ンポーネントが消えるときに、setIntervalで設定したタイマーを解除するための関数を返す
     return () => clearInterval(interval);
   }, []);
-  
+
   //isRunning: ストップウォッチが動いているかどうか
   const [isRunning, setIsRunning] = useState(false);
   //elapsedTime: 経過時間(秒)
@@ -82,10 +87,13 @@ const App: React.FC = () => {
   //timerRef: timerIDを保持
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  const [startTimestamp, setStartTimestamp] = useState<string | null>(null);
+  const [stopTimestamp, setStopTimestamp] = useState<string | null>(null);
 
   const startTimer = () => {
     if (!isRunning) {
       setIsRunning(true);
+      setStartTimestamp(new Date().toLocaleTimeString());
       timerRef.current = setInterval(() => {
         setElapsedTime((prev) => prev + 1);
       }, 1000);
@@ -95,13 +103,14 @@ const App: React.FC = () => {
   const stopTimer = () => {
     if (isRunning) {
       setIsRunning(false);
+      setStopTimestamp(new Date().toLocaleTimeString());
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
     }
   };
-  
+
   const formatTime = (time: number) => {
     const getSeconds = `0${time % 60}`.slice(-2);
     const minutes = Math.floor(time / 60);
@@ -109,7 +118,6 @@ const App: React.FC = () => {
     const getHours = `0${Math.floor(time / 3600)}`.slice(-2);
     return `${getHours}:${getMinutes}:${getSeconds}`;
   };
-  
 
   //JSX記法
   return (
@@ -138,6 +146,12 @@ const App: React.FC = () => {
         <Button onClick={stopTimer}>Stop</Button>
       </ButtonArea>
       <TimeDisplay>{formatTime(elapsedTime)}</TimeDisplay>
+      <TimestampDisplay>
+        Start Time: {startTimestamp || "Not started yet"}
+      </TimestampDisplay>
+      <TimestampDisplay>
+        Stop Time: {stopTimestamp || "Not stopped yet"}
+      </TimestampDisplay>
     </Container>
   );
 };
