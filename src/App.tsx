@@ -103,7 +103,7 @@ const App: React.FC = () => {
       }, 1000);
       progressRef.current = setInterval(() => {
         setPercentage((prev) => (prev < 100 ? prev + 1 : 0));
-      }, 100); // 10秒で一周するように100msごとに1%増加
+      }, 100); // 10秒で一周するように100msごとに1%増加.
     }
   };
 
