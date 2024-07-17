@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react"; //useEffect
 import styled from "styled-components";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
@@ -65,6 +65,7 @@ const App: React.FC = () => {
   const [percentage, setPercentage] = useState(0);
   // console.log("percentage", percentage);
 
+  /*
   //useEffect: Reactのフック、コンポーネントが表示された時や更新された時に実行したい処理を定義
   //コンポーネントが表示された後にタイマーを設定し、一定間隔でpercentageを更新
   useEffect(() => {
@@ -79,6 +80,7 @@ const App: React.FC = () => {
     //ンポーネントが消えるときに、setIntervalで設定したタイマーを解除するための関数を返す
     return () => clearInterval(interval);
   }, []);
+  */
 
   //isRunning: ストップウォッチが動いているかどうか
   const [isRunning, setIsRunning] = useState(false);
@@ -90,6 +92,8 @@ const App: React.FC = () => {
   const [startTimestamp, setStartTimestamp] = useState<string | null>(null);
   const [stopTimestamp, setStopTimestamp] = useState<string | null>(null);
 
+  const progressRef = useRef<NodeJS.Timeout | null>(null);
+
   const startTimer = () => {
     if (!isRunning) {
       setIsRunning(true);
@@ -97,6 +101,9 @@ const App: React.FC = () => {
       timerRef.current = setInterval(() => {
         setElapsedTime((prev) => prev + 1);
       }, 1000);
+      progressRef.current = setInterval(() => {
+        setPercentage((prev) => (prev < 100 ? prev + 1 : 0));
+      }, 100); // 10秒で一周するように100msごとに1%増加
     }
   };
 
@@ -107,6 +114,10 @@ const App: React.FC = () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
+      }
+      if (progressRef.current) {
+        clearInterval(progressRef.current);
+        progressRef.current = null;
       }
     }
   };
