@@ -36,8 +36,13 @@ const Center = styled.div`
 `;
 
 const RightSide = styled.div`
-  background-color: #f0f4f8;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f4f8;
+  padding: 20px;
 `;
 
 const TextInput = styled.textarea`
@@ -45,12 +50,13 @@ const TextInput = styled.textarea`
   height: 30px; /* 1行分のサイズ */
   padding: 10px;
   font-size: 16px;
-  border-radius: 5px;
   border: none;
-  box-shadow: inset 5px 5px 10px #cfcfcf, inset -5px -5px 10px #fff;
-  resize: none;
-  background-color: #f0f4f8;
+  border-bottom: 2px solid #333;
+  background-color: #f0f0f0;
   color: #333;
+  margin-bottom: 20px;
+  resize: none;
+  box-shadow: none; /* ボックスシャドウを削除 */
 `;
 
 const ButtonArea = styled.div`
@@ -109,6 +115,25 @@ const TaskListItem = styled.li`
   padding: 10px;
   border-radius: 5px;
   background-color: #f0f0f0;
+`;
+
+const Label = styled.label`
+  font-size: 18px;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  color: #333;
+`;
+
+const InputField = styled.input`
+  width: 100%;
+  padding: 15px;
+  font-size: 16px;
+  border: none;
+  border-radius: 25px; /* Rounded corners */
+  background-color: #f0f0f0;
+  box-shadow: inset 5px 5px 10px #cbced1, inset -5px -5px 10px #fff;
+  color: #333;
+  margin-bottom: 20px;
 `;
 
 
@@ -185,9 +210,9 @@ const App: React.FC = () => {
     return `${getHours}:${getMinutes}:${getSeconds}`;
   };
 
-  const Checkbox = styled.input.attrs({ type: 'checkbox' })`
-  margin-right: 10px;
-`;
+  const Checkbox = styled.input.attrs({ type: "checkbox" })`
+    margin-right: 10px;
+  `;
 
   //JSX記法
   return (
@@ -196,10 +221,26 @@ const App: React.FC = () => {
         <h2>Text Input Area</h2>
         <TextInput placeholder="Type something here..." />
         <TaskList>
-          <TaskListItem> <Checkbox />仕様書を書く</TaskListItem>
-          <TaskListItem> <Checkbox />ミーティング</TaskListItem>
-          <TaskListItem> <Checkbox />不具合No.10修正</TaskListItem>
-          <TaskListItem> <Checkbox />テスト環境構築</TaskListItem>
+          <TaskListItem>
+            {" "}
+            <Checkbox />
+            仕様書を書く
+          </TaskListItem>
+          <TaskListItem>
+            {" "}
+            <Checkbox />
+            ミーティング
+          </TaskListItem>
+          <TaskListItem>
+            {" "}
+            <Checkbox />
+            不具合No.10修正
+          </TaskListItem>
+          <TaskListItem>
+            {" "}
+            <Checkbox />
+            テスト環境構築
+          </TaskListItem>
         </TaskList>
       </LeftSide>
       <Center>
@@ -234,7 +275,17 @@ const App: React.FC = () => {
           Stop Time: {stopTimestamp || "Not stopped yet"}
         </TimestampDisplay>
       </Center>
-      <RightSide />
+      <RightSide>
+        <h2>Project Details</h2>
+        <Label>プロジェクトNo.</Label>
+        <InputField placeholder="Enter project number..." />
+        <Label>プロジェクト名</Label>
+        <InputField placeholder="Enter project name..." />
+        <Label>作業内容</Label>
+        <InputField placeholder="Enter task description..." />
+        <Label>備考</Label>
+        <InputField placeholder="Enter additional notes..." />
+      </RightSide>
     </Container>
   );
 };
