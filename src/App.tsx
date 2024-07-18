@@ -173,6 +173,17 @@ const App: React.FC = () => {
   const [isStopped, setIsStopped] = useState(false);
 
   const progressRef = useRef<NodeJS.Timeout | null>(null);
+  const [inputDuration, setInputDuration] = useState('');
+  const [duration, setDuration] = useState(10); // 初期設定を10秒に設定
+  
+  const handleDurationChange = () => {
+    const newDuration = parseInt(inputDuration);
+    if (!isNaN(newDuration) && newDuration > 0) {
+      setDuration(newDuration);
+      setInputDuration('');
+      resetTimer(); // 新しいdurationを設定後にタイマーをリセット
+    }
+  };
 
   const startTimer = () => {
     if (!isRunning) {
@@ -197,7 +208,7 @@ const App: React.FC = () => {
             return prev;
           }
         });
-      }, 100);
+      },  duration * 10);
     }
   };
 
@@ -300,6 +311,15 @@ const App: React.FC = () => {
         <TimestampDisplay>
           Stop Time: {stopTimestamp || "Not stopped yet"}
         </TimestampDisplay>
+        <div>
+          <input
+            type="number"
+            value={inputDuration}
+            onChange={(e) => setInputDuration(e.target.value)}
+            placeholder="Set duration (seconds)"
+          />
+          <Button onClick={handleDurationChange}>Set Duration</Button>
+        </div>
       </Center>
       <RightSide>
         <h2>Project Details</h2>
