@@ -180,7 +180,6 @@ const App: React.FC = () => {
     const newDuration = parseInt(inputDuration);
     if (!isNaN(newDuration) && newDuration > 0) {
       setDuration(newDuration);
-      setInputDuration('');
       resetTimer(); // 新しいdurationを設定後にタイマーをリセット
     }
   };
@@ -289,7 +288,7 @@ const App: React.FC = () => {
         */}
           <CircularProgressbar
             value={percentage}
-            text={`${(10 - percentage / 10).toFixed(0)}s`}
+            text={`${((duration - (duration * percentage) / 100)).toFixed(0)}s`}
             styles={buildStyles({
               pathTransitionDuration: 0.15,
               textColor: "#000",
