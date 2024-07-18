@@ -136,7 +136,6 @@ const InputField = styled.input`
   margin-bottom: 20px;
 `;
 
-
 //FC:Functional Component
 const App: React.FC = () => {
   //percentage: 現在の進捗
@@ -171,25 +170,41 @@ const App: React.FC = () => {
 
   const [startTimestamp, setStartTimestamp] = useState<string | null>(null);
   const [stopTimestamp, setStopTimestamp] = useState<string | null>(null);
+  const [isStopped, setIsStopped] = useState(false);
 
   const progressRef = useRef<NodeJS.Timeout | null>(null);
 
   const startTimer = () => {
     if (!isRunning) {
       setIsRunning(true);
+      setIsStopped(false);
       setStartTimestamp(new Date().toLocaleTimeString());
       timerRef.current = setInterval(() => {
+        console.log("timerRef");
         setElapsedTime((prev) => prev + 1);
       }, 1000);
       progressRef.current = setInterval(() => {
-        setPercentage((prev) => (prev < 100 ? prev + 1 : 0));
-      }, 100); // 10秒で一周するように100msごとに1%増加.
+        setPercentage((prev) => {
+          console.log(1);
+          if (prev < 100) {
+            console.log(2);
+
+            return prev + 1;
+          } else {
+            console.log(3);
+
+            clearInterval(progressRef.current as NodeJS.Timeout);
+            return prev;
+          }
+        });
+      }, 100);
     }
   };
 
   const stopTimer = () => {
     if (isRunning) {
       setIsRunning(false);
+      setIsStopped(true);
       setStopTimestamp(new Date().toLocaleTimeString());
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -208,6 +223,15 @@ const App: React.FC = () => {
     const getMinutes = `0${minutes % 60}`.slice(-2);
     const getHours = `0${Math.floor(time / 3600)}`.slice(-2);
     return `${getHours}:${getMinutes}:${getSeconds}`;
+  };
+
+  const resetTimer = () => {
+    setIsRunning(false);
+    setElapsedTime(0);
+    setPercentage(0);
+    setStartTimestamp(null);
+    setStopTimestamp(null);
+    setIsStopped(false);
   };
 
   const Checkbox = styled.input.attrs({ type: "checkbox" })`
@@ -265,7 +289,9 @@ const App: React.FC = () => {
         </CircleContainer>
         <ButtonArea>
           <Button onClick={startTimer}>Start</Button>
-          <Button onClick={stopTimer}>Stop</Button>
+          <Button onClick={isStopped ? resetTimer : stopTimer}>
+            {isStopped ? "Reset" : "Stop"}
+          </Button>
         </ButtonArea>
         <TimeDisplay>{formatTime(elapsedTime)}</TimeDisplay>
         <TimestampDisplay>
