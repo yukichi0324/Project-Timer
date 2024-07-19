@@ -2,6 +2,8 @@ import React, { useState, useRef } from "react"; //useEffect
 import styled from "styled-components";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import DatePicker from "react-datepicker";
+import 'react-datepicker/dist/react-datepicker.css';
 
 const Container = styled.div`
   /* display: flex;
@@ -136,6 +138,26 @@ const InputField = styled.input`
   margin-bottom: 20px;
 `;
 
+const DatePickerContainer = styled.div`
+  margin-bottom: 20px;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff;
+  background: #f0f0f3;
+`;
+
+const StyledDatePicker = styled(DatePicker)`
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: inset 6px 6px 10px #bebebe, inset -6px -6px 10px #ffffff;
+  background: #f0f0f3;
+  .react-datepicker__day--selected {
+    background-color: #6a82fb !important;
+    color: white !important;
+  }
+`;
+
 //FC:Functional Component
 const App: React.FC = () => {
   //percentage: 現在の進捗
@@ -175,6 +197,8 @@ const App: React.FC = () => {
   const progressRef = useRef<NodeJS.Timeout | null>(null);
   const [inputDuration, setInputDuration] = useState("");
   const [duration, setDuration] = useState(10); // 初期設定を10秒に設定
+
+  const [startDate, setStartDate] = useState<Date | null>(new Date());
 
   const handleDurationChange = () => {
     const newDuration = parseInt(inputDuration);
@@ -273,13 +297,14 @@ const App: React.FC = () => {
   };
 
   const handleViewKintone = () => {
-    window.open('https://kintone.cybozu.co.jp/', '_blank');
+    window.open("https://kintone.cybozu.co.jp/", "_blank");
   };
 
   //JSX記法
   return (
     <Container>
       <LeftSide>
+        
         <h2>Text Input Area</h2>
         <TextInput placeholder="Type something here..." />
         <TaskList>
@@ -304,6 +329,15 @@ const App: React.FC = () => {
             テスト環境構築
           </TaskListItem>
         </TaskList>
+        <DatePickerContainer>
+        <DatePicker
+            selected={startDate}
+            onChange={(date: Date | null) => {
+              if (date) setStartDate(date);
+            }}
+            inline
+          />
+        </DatePickerContainer>
       </LeftSide>
       <Center>
         <div>Hello World</div>
@@ -370,8 +404,8 @@ const App: React.FC = () => {
         <Label>備考</Label>
         <InputField placeholder="Enter additional notes..." />
         <div>
-        <Button onClick={handleAPIPost}>POST API</Button>
-        <Button onClick={handleViewKintone}>View kintone</Button>
+          <Button onClick={handleAPIPost}>POST API</Button>
+          <Button onClick={handleViewKintone}>View kintone</Button>
         </div>
       </RightSide>
     </Container>
