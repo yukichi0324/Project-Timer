@@ -272,6 +272,10 @@ const App: React.FC = () => {
     }
   };
 
+  const handleViewKintone = () => {
+    window.open('https://kintone.cybozu.co.jp/', '_blank');
+  };
+
   //JSX記法
   return (
     <Container>
@@ -345,7 +349,7 @@ const App: React.FC = () => {
         </div>
       </Center>
       <RightSide>
-        <h2>Project Details</h2>
+        {/* <h2>Project Details</h2> */}
         <Label>API Headers</Label>
         <InputField
           placeholder="X-Cybozu-API-Token"
@@ -365,7 +369,10 @@ const App: React.FC = () => {
         <InputField placeholder="Enter task description..." />
         <Label>備考</Label>
         <InputField placeholder="Enter additional notes..." />
-        <Button onClick={handleAPIPost}>APIPOST</Button>
+        <div>
+        <Button onClick={handleAPIPost}>POST API</Button>
+        <Button onClick={handleViewKintone}>View kintone</Button>
+        </div>
       </RightSide>
     </Container>
   );
