@@ -102,6 +102,7 @@ const TimeDisplay = styled.div`
 const TimestampDisplay = styled.div`
   font-size: 18px;
   margin-top: 10px;
+  width: 80%;
 `;
 
 const TaskList = styled.ul`
@@ -137,6 +138,19 @@ const InputField = styled.input`
   color: #333;
   margin-bottom: 20px;
 `;
+
+const LeftInputField = styled.input`
+  width: 80%;
+  padding: 15px;
+  font-size: 16px;
+  border: none;
+  //border-radius: 25px; /* Rounded corners */
+  background-color: #f0f0f0;
+  box-shadow: inset 5px 5px 10px #cbced1, inset -5px -5px 10px #fff;
+  color: #333;
+  margin-bottom: 20px;
+`;
+
 
 const DatePickerContainer = styled.div`
   margin-bottom: 20px;
@@ -306,26 +320,18 @@ const App: React.FC = () => {
       <LeftSide>
         
         <h2>Text Input Area</h2>
-        <TextInput placeholder="Type something here..." />
+        <LeftInputField placeholder="Enter project number..." />
         <TaskList>
           <TaskListItem>
-            {" "}
-            <Checkbox />
             仕様書を書く
           </TaskListItem>
           <TaskListItem>
-            {" "}
-            <Checkbox />
             ミーティング
           </TaskListItem>
           <TaskListItem>
-            {" "}
-            <Checkbox />
             不具合No.10修正
           </TaskListItem>
           <TaskListItem>
-            {" "}
-            <Checkbox />
             テスト環境構築
           </TaskListItem>
         </TaskList>
