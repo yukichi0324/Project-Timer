@@ -173,9 +173,9 @@ const App: React.FC = () => {
   const [isStopped, setIsStopped] = useState(false);
 
   const progressRef = useRef<NodeJS.Timeout | null>(null);
-  const [inputDuration, setInputDuration] = useState('');
+  const [inputDuration, setInputDuration] = useState("");
   const [duration, setDuration] = useState(10); // 初期設定を10秒に設定
-  
+
   const handleDurationChange = () => {
     const newDuration = parseInt(inputDuration);
     if (!isNaN(newDuration) && newDuration > 0) {
@@ -207,7 +207,7 @@ const App: React.FC = () => {
             return prev;
           }
         });
-      },  duration * 10);
+      }, duration * 10);
     }
   };
 
@@ -247,6 +247,30 @@ const App: React.FC = () => {
   const Checkbox = styled.input.attrs({ type: "checkbox" })`
     margin-right: 10px;
   `;
+  const [headerToken, setHeaderToken] = useState("");
+  const [headerContentType, setHeaderContentType] = useState("");
+
+  const handleAPIPost = async () => {
+    try {
+      const headers: Record<string, string> = {};
+      if (headerToken) headers["X-Cybozu-API-Token"] = headerToken;
+      if (headerContentType) headers["Content-Type"] = headerContentType;
+
+      const response = await fetch("https://example.com/api", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          elapsedTime,
+          startTimestamp,
+          stopTimestamp,
+        }),
+      });
+      const data = await response.json();
+      console.log("API Response:", data);
+    } catch (error) {
+      console.error("API Error:", error);
+    }
+  };
 
   //JSX記法
   return (
@@ -288,7 +312,7 @@ const App: React.FC = () => {
         */}
           <CircularProgressbar
             value={percentage}
-            text={`${((duration - (duration * percentage) / 100)).toFixed(0)}s`}
+            text={`${(duration - (duration * percentage) / 100).toFixed(0)}s`}
             styles={buildStyles({
               pathTransitionDuration: 0.15,
               textColor: "#000",
@@ -322,6 +346,17 @@ const App: React.FC = () => {
       </Center>
       <RightSide>
         <h2>Project Details</h2>
+        <Label>API Headers</Label>
+        <InputField
+          placeholder="X-Cybozu-API-Token"
+          value={headerToken}
+          onChange={(e) => setHeaderToken(e.target.value)}
+        />
+        <InputField
+          placeholder="Content-Type"
+          value={headerContentType}
+          onChange={(e) => setHeaderContentType(e.target.value)}
+        />
         <Label>プロジェクトNo.</Label>
         <InputField placeholder="Enter project number..." />
         <Label>プロジェクト名</Label>
@@ -330,6 +365,7 @@ const App: React.FC = () => {
         <InputField placeholder="Enter task description..." />
         <Label>備考</Label>
         <InputField placeholder="Enter additional notes..." />
+        <Button onClick={handleAPIPost}>APIPOST</Button>
       </RightSide>
     </Container>
   );
