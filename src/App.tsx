@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import DatePicker from "react-datepicker";
-import 'react-datepicker/dist/react-datepicker.css';
+import "react-datepicker/dist/react-datepicker.css";
 
 const Container = styled.div`
   /* display: flex;
@@ -151,7 +151,6 @@ const LeftInputField = styled.input`
   margin-bottom: 20px;
 `;
 
-
 const DatePickerContainer = styled.div`
   margin-bottom: 20px;
   padding: 20px;
@@ -286,7 +285,20 @@ const App: React.FC = () => {
     margin-right: 10px;
   `;
   const [headerToken, setHeaderToken] = useState("");
-  const [headerContentType, setHeaderContentType] = useState("");
+  const [headerContentType, setHeaderContentType] =
+    useState("application/json");
+
+  const [appId, setAppId] = useState("");
+  const [apiUrl, setApiUrl] = useState("");
+
+  const [createUserName, setCreateUserName] = useState("");
+  const [createUserCode, setCreateUserCode] = useState("");
+
+  const [workDescription, setWorkDescription] = useState("");
+
+  const [notes, setNotes] = useState("");
+  const [projectName, setProjectName] = useState("");
+  const [projectNum, setProjectNum] = useState("");
 
   const handleAPIPost = async () => {
     try {
@@ -294,15 +306,89 @@ const App: React.FC = () => {
       if (headerToken) headers["X-Cybozu-API-Token"] = headerToken;
       if (headerContentType) headers["Content-Type"] = headerContentType;
 
-      const response = await fetch("https://example.com/api", {
+      const body = {
+        app: appId,
+        record: {
+          Table: {
+            type: "SUBTABLE",
+            value: [
+              {
+                value: {
+                  備考: {
+                    type: "SINGLE_LINE_TEXT",
+                    value: notes,
+                  },
+                  開始時刻: {
+                    type: "TIME",
+                    value: startTimestamp,
+                  },
+                  作業時間: {
+                    type: "CALC",
+                    value: `${Math.floor(elapsedTime / 3600)
+                      .toString()
+                      .padStart(2, "0")}:${Math.floor((elapsedTime % 3600) / 60)
+                      .toString()
+                      .padStart(2, "0")}`,
+                  },
+                  作業内容: {
+                    type: "SINGLE_LINE_TEXT",
+                    value: workDescription,
+                  },
+                  終了時刻: {
+                    type: "TIME",
+                    value: stopTimestamp,
+                  },
+                },
+              },
+            ],
+          },
+          更新者: {
+            type: "MODIFIER",
+            value: {
+              code: createUserCode,
+              name: createUserName,
+            },
+          },
+          作成者: {
+            type: "CREATOR",
+            value: {
+              code: createUserCode,
+              name: createUserName,
+            },
+          },
+          プロジェクト名: {
+            type: "SINGLE_LINE_TEXT",
+            value: projectName,
+          },
+          プロジェクトNo: {
+            type: "NUMBER",
+            value: projectNum,
+          },
+          // 工数合計: {
+          //   type: "CALC",
+          //   value: `${Math.floor(elapsedTime / 60)
+          //     .toString()
+          //     .padStart(2, "0")}:${(elapsedTime % 60)
+          //     .toString()
+          //     .padStart(2, "0")}`,
+          // },
+          日付: {
+            type: "DATE",
+            value: new Date().toISOString().split("T")[0],
+          },
+        },
+      };
+
+      console.log("headers", headers);
+      console.log("body", JSON.stringify(body));
+
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers,
-        body: JSON.stringify({
-          elapsedTime,
-          startTimestamp,
-          stopTimestamp,
-        }),
+        body: JSON.stringify(body),
+        mode: 'cors' // 必要な設定
       });
+
       const data = await response.json();
       console.log("API Response:", data);
     } catch (error) {
@@ -318,32 +404,29 @@ const App: React.FC = () => {
   return (
     <Container>
       <LeftSide>
-        
-        <h2>Text Input Area</h2>
-        <LeftInputField placeholder="Enter project number..." />
-        <TaskList>
-          <TaskListItem>
-            仕様書を書く
-          </TaskListItem>
-          <TaskListItem>
-            ミーティング
-          </TaskListItem>
-          <TaskListItem>
-            不具合No.10修正
-          </TaskListItem>
-          <TaskListItem>
-            テスト環境構築
-          </TaskListItem>
-        </TaskList>
-        <DatePickerContainer>
-        <DatePicker
-            selected={startDate}
-            onChange={(date: Date | null) => {
-              if (date) setStartDate(date);
-            }}
-            inline
-          />
-        </DatePickerContainer>
+        <Label>API Url</Label>
+        <InputField
+          placeholder="url"
+          value={apiUrl}
+          onChange={(e) => setApiUrl(e.target.value)}
+        />
+        <Label>APP Id</Label>
+        <InputField
+          placeholder="app"
+          value={appId}
+          onChange={(e) => setAppId(e.target.value)}
+        />
+        <Label>User config</Label>
+        <InputField
+          placeholder="作成者.name  例) テスト太郎"
+          value={createUserName}
+          onChange={(e) => setCreateUserName(e.target.value)}
+        />
+        <InputField
+          placeholder="作成者.code  例) test@gmail.com"
+          value={createUserCode}
+          onChange={(e) => setCreateUserCode(e.target.value)}
+        />
       </LeftSide>
       <Center>
         <div>Hello World</div>
@@ -396,19 +479,35 @@ const App: React.FC = () => {
           value={headerToken}
           onChange={(e) => setHeaderToken(e.target.value)}
         />
-        <InputField
+        {/* <InputField
           placeholder="Content-Type"
           value={headerContentType}
           onChange={(e) => setHeaderContentType(e.target.value)}
+        /> */}
+        <Label>Body</Label>
+        <InputField
+          placeholder="プロジェクトNo"
+          value={projectNum}
+          onChange={(e) => setProjectNum(e.target.value)}
         />
-        <Label>プロジェクトNo.</Label>
-        <InputField placeholder="Enter project number..." />
-        <Label>プロジェクト名</Label>
-        <InputField placeholder="Enter project name..." />
-        <Label>作業内容</Label>
-        <InputField placeholder="Enter task description..." />
-        <Label>備考</Label>
-        <InputField placeholder="Enter additional notes..." />
+        {/* <Label>プロジェクト名</Label> */}
+        <InputField
+          placeholder="プロジェクト名"
+          value={projectName}
+          onChange={(e) => setProjectName(e.target.value)}
+        />
+        {/* <Label>作業内容 Work description</Label> */}
+        <InputField
+          placeholder="作業内容"
+          value={workDescription}
+          onChange={(e) => setWorkDescription(e.target.value)}
+        />
+        {/* <Label>備考</Label> */}
+        <InputField
+          placeholder="備考"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+        />
         <div>
           <Button onClick={handleAPIPost}>POST API</Button>
           <Button onClick={handleViewKintone}>View kintone</Button>
