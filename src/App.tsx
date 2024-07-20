@@ -196,9 +196,7 @@ const App: React.FC = () => {
     setIsStopped(false);
   };
 
-  const Checkbox = styled.input.attrs({ type: "checkbox" })`
-    margin-right: 10px;
-  `;
+
   const [headerToken, setHeaderToken] = useState("");
   const [headerContentType, setHeaderContentType] =
     useState("application/json");
