@@ -37,7 +37,6 @@ const RightSide = styled.div`
   padding: 20px;
 `;
 
-
 const ButtonArea = styled.div`
   display: flex;
   flex-direction: row;
@@ -107,7 +106,6 @@ const SettingInputField = styled.input`
   margin-bottom: 20px;
 `;
 
-
 const CenterDisplay = styled.div`
   text-align: center;
 `;
@@ -126,7 +124,6 @@ const App: React.FC = () => {
   const [inputDuration, setInputDuration] = useState("1");
   const [duration, setDuration] = useState(60);
 
-
   const handleDurationChange = () => {
     const newDuration = parseInt(inputDuration);
     if (!isNaN(newDuration) && newDuration > 0) {
@@ -139,7 +136,9 @@ const App: React.FC = () => {
     if (!isRunning) {
       setIsRunning(true);
       setIsStopped(false);
-      setStartTimestamp(new Date().toLocaleTimeString());
+      if (startTimestamp == null) {
+        setStartTimestamp(new Date().toLocaleTimeString());
+      }
       timerRef.current = setInterval(() => {
         setElapsedTime((prev) => prev + 1);
       }, 1000);
@@ -188,7 +187,6 @@ const App: React.FC = () => {
     setStopTimestamp(null);
     setIsStopped(false);
   };
-
 
   const [headerToken, setHeaderToken] = useState("");
   const [headerContentType, setHeaderContentType] =
