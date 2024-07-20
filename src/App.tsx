@@ -307,9 +307,9 @@ const App: React.FC = () => {
       const result = await response.json();
 
       if (response.ok) {
-        console.log("xxx");
         // 成功の場合
-        toast.success(`API Request Successful: ${JSON.stringify(result)}`);
+        let sucessResult = JSON.parse(result);
+        toast.success(`API Request Successful: ID:${sucessResult.id} のレコードが追加されました`);
       } else {
         // エラーの場合
         let details = JSON.parse(result.details);
