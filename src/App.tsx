@@ -1,19 +1,10 @@
-import React, { useState, useRef } from "react"; //useEffect
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const Container = styled.div`
-  /* display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  font-size: 24px;
-  background-color: #f0f4f8; /* 背景色を変更 
-  padding: 20px; */
   display: flex;
   height: 100vh;
 `;
@@ -47,19 +38,6 @@ const RightSide = styled.div`
   padding: 20px;
 `;
 
-const TextInput = styled.textarea`
-  width: 80%;
-  height: 30px; /* 1行分のサイズ */
-  padding: 10px;
-  font-size: 16px;
-  border: none;
-  border-bottom: 2px solid #333;
-  background-color: #f0f0f0;
-  color: #333;
-  margin-bottom: 20px;
-  resize: none;
-  box-shadow: none; /* ボックスシャドウを削除 */
-`;
 
 const ButtonArea = styled.div`
   display: flex;
@@ -94,29 +72,9 @@ const CircleContainer = styled.div`
   margin-top: 20px;
 `;
 
-const TimeDisplay = styled.div`
-  font-size: 24px;
-  margin-top: 20px;
-`;
-
 const TimestampDisplay = styled.div`
   font-size: 18px;
   text-align: center;
-`;
-
-const TaskList = styled.ul`
-  list-style-type: none;
-  padding: 0;
-  font-size: 18px;
-  color: #333;
-`;
-
-const TaskListItem = styled.li`
-  margin: 10px 0;
-  box-shadow: 5px 5px 10px #cbced1, -5px -5px 10px #fff;
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #f0f0f0;
 `;
 
 const Label = styled.label`
@@ -150,72 +108,15 @@ const SettingInputField = styled.input`
   margin-bottom: 20px;
 `;
 
-const LeftInputField = styled.input`
-  width: 80%;
-  padding: 15px;
-  font-size: 16px;
-  border: none;
-  //border-radius: 25px; /* Rounded corners */
-  background-color: #f0f0f0;
-  box-shadow: inset 5px 5px 10px #cbced1, inset -5px -5px 10px #fff;
-  color: #333;
-  margin-bottom: 20px;
-`;
-
-const DatePickerContainer = styled.div`
-  margin-bottom: 20px;
-  padding: 20px;
-  border-radius: 20px;
-  box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff;
-  background: #f0f0f3;
-`;
 
 const CenterDisplay = styled.div`
   text-align: center;
 `;
 
-const StyledDatePicker = styled(DatePicker)`
-  border: none;
-  border-radius: 10px;
-  padding: 10px;
-  box-shadow: inset 6px 6px 10px #bebebe, inset -6px -6px 10px #ffffff;
-  background: #f0f0f3;
-  .react-datepicker__day--selected {
-    background-color: #6a82fb !important;
-    color: white !important;
-  }
-`;
-
-//FC:Functional Component
 const App: React.FC = () => {
-  //percentage: 現在の進捗
-  //setPercentage: 進捗更新
-  //useState: Reactのフック、状態管理で使用
   const [percentage, setPercentage] = useState(0);
-  // console.log("percentage", percentage);
-
-  /*
-  //useEffect: Reactのフック、コンポーネントが表示された時や更新された時に実行したい処理を定義
-  //コンポーネントが表示された後にタイマーを設定し、一定間隔でpercentageを更新
-  useEffect(() => {
-    //setInterval: 一定の時間ごとに特定の処理を繰り返し実行
-    const interval = setInterval(() => {
-      //prev: 前回のパーセンテージの値
-      setPercentage((prev) => (prev < 100 ? prev + 1 : 0));
-      //100ミリ秒ごとに上記のsetPercentageの処理を実行
-    }, 100); // 10秒で一周するように調整（100msごとに1%増加）
-    //}, 600);  //TODO：60秒。任意の数字に変えられるようにしたい
-
-    //ンポーネントが消えるときに、setIntervalで設定したタイマーを解除するための関数を返す
-    return () => clearInterval(interval);
-  }, []);
-  */
-
-  //isRunning: ストップウォッチが動いているかどうか
   const [isRunning, setIsRunning] = useState(false);
-  //elapsedTime: 経過時間(秒)
   const [elapsedTime, setElapsedTime] = useState(0);
-  //timerRef: timerIDを保持
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [startTimestamp, setStartTimestamp] = useState<string | null>(null);
@@ -224,9 +125,8 @@ const App: React.FC = () => {
 
   const progressRef = useRef<NodeJS.Timeout | null>(null);
   const [inputDuration, setInputDuration] = useState("");
-  const [duration, setDuration] = useState(10); // 初期設定を10秒に設定
+  const [duration, setDuration] = useState(1);
 
-  const [startDate, setStartDate] = useState<Date | null>(new Date());
 
   const handleDurationChange = () => {
     const newDuration = parseInt(inputDuration);
@@ -379,14 +279,6 @@ const App: React.FC = () => {
             type: "NUMBER",
             value: projectNum,
           },
-          // 工数合計: {
-          //   type: "CALC",
-          //   value: `${Math.floor(elapsedTime / 60)
-          //     .toString()
-          //     .padStart(2, "0")}:${(elapsedTime % 60)
-          //     .toString()
-          //     .padStart(2, "0")}`,
-          // },
           日付: {
             type: "DATE",
             value: new Date().toISOString().split("T")[0],
@@ -446,12 +338,6 @@ const App: React.FC = () => {
       <Center>
         <div>enjoy your task</div>
         <CircleContainer>
-          {/* 
-        CircularProgressbar: react-circular-progressbarライブラリからのコンポーネントで、円形プログレスバーを表示。
-        value={percentage}: プログレスバーの進捗をpercentageで設定。
-        text={${(10 - percentage / 10).toFixed(0)}s}: 残り秒数をテキストとして表示。
-        styles: プログレスバーの見た目をカスタマイズ。
-        */}
           <CircularProgressbar
             value={percentage}
             text={formatTime(elapsedTime)}
@@ -468,7 +354,6 @@ const App: React.FC = () => {
             {isStopped ? "Reset" : "Stop"}
           </Button>
         </ButtonArea>
-        {/* <TimeDisplay>{formatTime(elapsedTime)}</TimeDisplay> */}
         <CenterDisplay>
           <TimestampDisplay>
             Start Time: {startTimestamp || "Not started yet"}
@@ -488,37 +373,28 @@ const App: React.FC = () => {
         </CenterDisplay>
       </Center>
       <RightSide>
-        {/* <h2>Project Details</h2> */}
         <Label>API Headers</Label>
         <InputField
           placeholder="X-Cybozu-API-Token"
           value={headerToken}
           onChange={(e) => setHeaderToken(e.target.value)}
         />
-        {/* <InputField
-          placeholder="Content-Type"
-          value={headerContentType}
-          onChange={(e) => setHeaderContentType(e.target.value)}
-        /> */}
         <Label>Body</Label>
         <InputField
           placeholder="プロジェクトNo"
           value={projectNum}
           onChange={(e) => setProjectNum(e.target.value)}
         />
-        {/* <Label>プロジェクト名</Label> */}
         <InputField
           placeholder="プロジェクト名"
           value={projectName}
           onChange={(e) => setProjectName(e.target.value)}
         />
-        {/* <Label>作業内容 Work description</Label> */}
         <InputField
           placeholder="作業内容"
           value={workDescription}
           onChange={(e) => setWorkDescription(e.target.value)}
         />
-        {/* <Label>備考</Label> */}
         <InputField
           placeholder="備考"
           value={notes}
