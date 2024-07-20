@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import "react-datepicker/dist/react-datepicker.css";
 
 const Container = styled.div`
   display: flex;
@@ -124,7 +123,7 @@ const App: React.FC = () => {
   const [isStopped, setIsStopped] = useState(false);
 
   const progressRef = useRef<NodeJS.Timeout | null>(null);
-  const [inputDuration, setInputDuration] = useState("");
+  const [inputDuration, setInputDuration] = useState("1");
   const [duration, setDuration] = useState(60);
 
 
