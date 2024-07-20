@@ -101,8 +101,7 @@ const TimeDisplay = styled.div`
 
 const TimestampDisplay = styled.div`
   font-size: 18px;
-  margin-top: 10px;
-  width: 80%;
+  text-align: center;
 `;
 
 const TaskList = styled.ul`
@@ -139,6 +138,18 @@ const InputField = styled.input`
   margin-bottom: 20px;
 `;
 
+const SettingInputField = styled.input`
+  width: 20%;
+  padding: 15px;
+  font-size: 16px;
+  border: none;
+  border-radius: 25px; /* Rounded corners */
+  background-color: #f0f0f0;
+  box-shadow: inset 5px 5px 10px #cbced1, inset -5px -5px 10px #fff;
+  color: #333;
+  margin-bottom: 20px;
+`;
+
 const LeftInputField = styled.input`
   width: 80%;
   padding: 15px;
@@ -157,6 +168,10 @@ const DatePickerContainer = styled.div`
   border-radius: 20px;
   box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff;
   background: #f0f0f3;
+`;
+
+const CenterDisplay = styled.div`
+  text-align: center;
 `;
 
 const StyledDatePicker = styled(DatePicker)`
@@ -216,7 +231,7 @@ const App: React.FC = () => {
   const handleDurationChange = () => {
     const newDuration = parseInt(inputDuration);
     if (!isNaN(newDuration) && newDuration > 0) {
-      setDuration(newDuration);
+      setDuration(newDuration * 60);
       resetTimer(); // 新しいdurationを設定後にタイマーをリセット
     }
   };
@@ -386,7 +401,7 @@ const App: React.FC = () => {
         method: "POST",
         headers,
         body: JSON.stringify(body),
-        mode: 'cors' // 必要な設定
+        mode: "cors", // 必要な設定
       });
 
       const data = await response.json();
@@ -429,7 +444,7 @@ const App: React.FC = () => {
         />
       </LeftSide>
       <Center>
-        <div>Hello World</div>
+        <div>enjoy your task</div>
         <CircleContainer>
           {/* 
         CircularProgressbar: react-circular-progressbarライブラリからのコンポーネントで、円形プログレスバーを表示。
@@ -439,11 +454,10 @@ const App: React.FC = () => {
         */}
           <CircularProgressbar
             value={percentage}
-            text={`${(duration - (duration * percentage) / 100).toFixed(0)}s`}
+            text={formatTime(elapsedTime)}
             styles={buildStyles({
-              pathTransitionDuration: 0.15,
-              textColor: "#000",
               pathColor: `rgba(62, 152, 199, ${percentage / 100})`,
+              textColor: "#000",
               trailColor: "#d6d6d6",
             })}
           />
@@ -454,22 +468,24 @@ const App: React.FC = () => {
             {isStopped ? "Reset" : "Stop"}
           </Button>
         </ButtonArea>
-        <TimeDisplay>{formatTime(elapsedTime)}</TimeDisplay>
-        <TimestampDisplay>
-          Start Time: {startTimestamp || "Not started yet"}
-        </TimestampDisplay>
-        <TimestampDisplay>
-          Stop Time: {stopTimestamp || "Not stopped yet"}
-        </TimestampDisplay>
-        <div>
-          <input
-            type="number"
-            value={inputDuration}
-            onChange={(e) => setInputDuration(e.target.value)}
-            placeholder="Set duration (seconds)"
-          />
-          <Button onClick={handleDurationChange}>Set Duration</Button>
-        </div>
+        {/* <TimeDisplay>{formatTime(elapsedTime)}</TimeDisplay> */}
+        <CenterDisplay>
+          <TimestampDisplay>
+            Start Time: {startTimestamp || "Not started yet"}
+          </TimestampDisplay>
+          <TimestampDisplay>
+            Stop Time: {stopTimestamp || "Not stopped yet"}
+          </TimestampDisplay>
+          <div>
+            <SettingInputField
+              type="number"
+              value={inputDuration}
+              onChange={(e) => setInputDuration(e.target.value)}
+              placeholder="分 単位"
+            />
+            <Button onClick={handleDurationChange}>設定</Button>
+          </div>
+        </CenterDisplay>
       </Center>
       <RightSide>
         {/* <h2>Project Details</h2> */}
