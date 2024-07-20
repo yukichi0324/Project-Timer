@@ -301,37 +301,19 @@ const App: React.FC = () => {
         method: "POST",
         headers,
         body: JSON.stringify(body),
-        mode: "cors", // 必要な設定
+        mode: "cors",
       });
-      console.log("ここまで進んだ", response);
+      
       const result = await response.json();
-      console.log("log2-1", result);
-      console.log("log2", result.message);
-      console.log("log2", result.details);
-      let test = JSON.parse(result.details);
-      console.log("log2", test);
-      console.log("log22", test.errors, test.errors[0]);
-      let messages = extractErrorMessages(test.errors);
-      messages.forEach((msg) => {
-        console.log(`Field: ${msg.field}, Message: ${msg.message}`);
-      });
-      let ers = test.errors;
-      console.log(ers[0]);
-      for (let index = 0; index < ers.length; index++) {
-        const element = ers[index];
-        console.log("log-error", element);
-      }
 
       if (response.ok) {
         console.log("xxx");
         // 成功の場合
         toast.success(`API Request Successful: ${JSON.stringify(result)}`);
       } else {
-        console.log("yyy", result.message);
         // エラーの場合
-        // toast.error(`API Request Failed: ${result.message || "Unknown error"}`);
-        let test = JSON.parse(result.details);
-        let messages = extractErrorMessages(test.errors);
+        let details = JSON.parse(result.details);
+        let messages = extractErrorMessages(details.errors);
         messages.forEach((msg) => {
           toast.error(`Field: ${msg.field}, Message: ${msg.message}`);
         });
