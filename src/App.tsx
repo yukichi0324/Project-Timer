@@ -2,6 +2,9 @@ import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { json } from "stream/consumers";
 
 const Container = styled.div`
   display: flex;
@@ -188,11 +191,15 @@ const App: React.FC = () => {
     setIsStopped(false);
   };
 
-  const [headerToken, setHeaderToken] = useState("SAtdki3FM5f87zIUVNnd40S2wxrFYrgqaJ0uwu73");
+  const [headerToken, setHeaderToken] = useState(
+    "SAtdki3FM5f87zIUVNnd40S2wxrFYrgqaJ0uwu73"
+  );
   const [headerContentType, setHeaderContentType] =
     useState("application/json");
 
-  const [apiUrl, setApiUrl] = useState("https://project-timer-backend.onrender.com/api/data");
+  const [apiUrl, setApiUrl] = useState(
+    "https://project-timer-backend.onrender.com/api/data"
+  );
   const [appId, setAppId] = useState("3");
 
   const [createUserName, setCreateUserName] = useState("");
@@ -203,6 +210,22 @@ const App: React.FC = () => {
   const [notes, setNotes] = useState("");
   const [projectName, setProjectName] = useState("");
   const [projectNum, setProjectNum] = useState("");
+
+  const extractErrorMessages = (errors: {
+    [x: string]: { messages: any[] };
+  }) => {
+    const extractedMessages: { field: string; message: any }[] = [];
+
+    for (const key in errors) {
+      if (errors[key].messages && errors[key].messages.length > 0) {
+        errors[key].messages.forEach((message) => {
+          extractedMessages.push({ field: key, message: message });
+        });
+      }
+    }
+
+    return extractedMessages;
+  };
 
   const handleAPIPost = async () => {
     try {
@@ -280,9 +303,42 @@ const App: React.FC = () => {
         body: JSON.stringify(body),
         mode: "cors", // 必要な設定
       });
-      const data = await response.json();
+      console.log("ここまで進んだ", response);
+      const result = await response.json();
+      console.log("log2-1", result);
+      console.log("log2", result.message);
+      console.log("log2", result.details);
+      let test = JSON.parse(result.details);
+      console.log("log2", test);
+      console.log("log22", test.errors, test.errors[0]);
+      let messages = extractErrorMessages(test.errors);
+      messages.forEach((msg) => {
+        console.log(`Field: ${msg.field}, Message: ${msg.message}`);
+      });
+      let ers = test.errors;
+      console.log(ers[0]);
+      for (let index = 0; index < ers.length; index++) {
+        const element = ers[index];
+        console.log("log-error", element);
+      }
+
+      if (response.ok) {
+        console.log("xxx");
+        // 成功の場合
+        toast.success(`API Request Successful: ${JSON.stringify(result)}`);
+      } else {
+        console.log("yyy", result.message);
+        // エラーの場合
+        // toast.error(`API Request Failed: ${result.message || "Unknown error"}`);
+        let test = JSON.parse(result.details);
+        let messages = extractErrorMessages(test.errors);
+        messages.forEach((msg) => {
+          toast.error(`Field: ${msg.field}, Message: ${msg.message}`);
+        });
+      }
     } catch (error) {
-      console.error("API Error:", error);
+      console.log("error", error);
+      toast.error(`API Error: ${(error as Error).message || String(error)}`);
     }
   };
 
@@ -387,6 +443,7 @@ const App: React.FC = () => {
           <Button onClick={handleViewKintone}>View kintone</Button>
         </div>
       </RightSide>
+      <ToastContainer />
     </Container>
   );
 };
