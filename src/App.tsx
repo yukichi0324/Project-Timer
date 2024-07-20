@@ -188,12 +188,12 @@ const App: React.FC = () => {
     setIsStopped(false);
   };
 
-  const [headerToken, setHeaderToken] = useState("");
+  const [headerToken, setHeaderToken] = useState("SAtdki3FM5f87zIUVNnd40S2wxrFYrgqaJ0uwu73");
   const [headerContentType, setHeaderContentType] =
     useState("application/json");
 
-  const [appId, setAppId] = useState("");
-  const [apiUrl, setApiUrl] = useState("");
+  const [apiUrl, setApiUrl] = useState("https://project-timer-backend.onrender.com/api/data");
+  const [appId, setAppId] = useState("3");
 
   const [createUserName, setCreateUserName] = useState("");
   const [createUserCode, setCreateUserCode] = useState("");
@@ -290,7 +290,6 @@ const App: React.FC = () => {
     window.open("https://kintone.cybozu.co.jp/", "_blank");
   };
 
-  //JSX記法
   return (
     <Container>
       <LeftSide>
@@ -308,12 +307,12 @@ const App: React.FC = () => {
         />
         <Label>User config</Label>
         <InputField
-          placeholder="作成者.name  例) テスト太郎"
+          placeholder="作成者.name"
           value={createUserName}
           onChange={(e) => setCreateUserName(e.target.value)}
         />
         <InputField
-          placeholder="作成者.code  例) test@gmail.com"
+          placeholder="作成者.code  *必須"
           value={createUserCode}
           onChange={(e) => setCreateUserCode(e.target.value)}
         />
