@@ -125,7 +125,7 @@ const App: React.FC = () => {
 
   const progressRef = useRef<NodeJS.Timeout | null>(null);
   const [inputDuration, setInputDuration] = useState("");
-  const [duration, setDuration] = useState(1);
+  const [duration, setDuration] = useState(60);
 
 
   const handleDurationChange = () => {
@@ -142,19 +142,13 @@ const App: React.FC = () => {
       setIsStopped(false);
       setStartTimestamp(new Date().toLocaleTimeString());
       timerRef.current = setInterval(() => {
-        console.log("timerRef");
         setElapsedTime((prev) => prev + 1);
       }, 1000);
       progressRef.current = setInterval(() => {
         setPercentage((prev) => {
-          console.log(1);
           if (prev < 100) {
-            console.log(2);
-
             return prev + 1;
           } else {
-            console.log(3);
-
             clearInterval(progressRef.current as NodeJS.Timeout);
             return prev;
           }
@@ -283,19 +277,13 @@ const App: React.FC = () => {
           },
         },
       };
-
-      console.log("headers", headers);
-      console.log("body", JSON.stringify(body));
-
       const response = await fetch(apiUrl, {
         method: "POST",
         headers,
         body: JSON.stringify(body),
         mode: "cors", // 必要な設定
       });
-
       const data = await response.json();
-      console.log("API Response:", data);
     } catch (error) {
       console.error("API Error:", error);
     }
