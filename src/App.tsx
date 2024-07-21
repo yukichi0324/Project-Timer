@@ -107,10 +107,18 @@ const SettingInputField = styled.input`
   box-shadow: inset 5px 5px 10px #cbced1, inset -5px -5px 10px #fff;
   color: #333;
   margin-bottom: 20px;
+
+  //矢印を非表示
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 `;
 
 const CenterDisplay = styled.div`
   text-align: center;
+  margin-top: 20px;
 `;
 
 const App: React.FC = () => {
@@ -132,6 +140,9 @@ const App: React.FC = () => {
     if (!isNaN(newDuration) && newDuration > 0) {
       setDuration(newDuration * 60);
       resetTimer(); // 新しいdurationを設定後にタイマーをリセット
+    }
+    else{
+      setInputDuration("1");
     }
   };
 
@@ -303,13 +314,15 @@ const App: React.FC = () => {
         body: JSON.stringify(body),
         mode: "cors",
       });
-      
+
       const result = await response.json();
 
       if (response.ok) {
         // 成功の場合
         let sucessResult = JSON.parse(result);
-        toast.success(`API Request Successful: ID:${sucessResult.id} のレコードが追加されました`);
+        toast.success(
+          `API Request Successful: ID:${sucessResult.id} のレコードが追加されました`
+        );
       } else {
         // エラーの場合
         let details = JSON.parse(result.details);
