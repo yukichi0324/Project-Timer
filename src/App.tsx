@@ -406,7 +406,10 @@ const App: React.FC = () => {
               onChange={(e) => setInputDuration(e.target.value)}
               placeholder="分 単位"
             />
-            <Button onClick={handleDurationChange} disabled={isRunning || isStopped}>
+            <Button
+              onClick={handleDurationChange}
+              disabled={isRunning || isStopped}
+            >
               設定
             </Button>
           </div>
@@ -441,7 +444,12 @@ const App: React.FC = () => {
           onChange={(e) => setNotes(e.target.value)}
         />
         <div>
-          <Button onClick={handleAPIPost}>POST API</Button>
+          <Button
+            onClick={handleAPIPost}
+            disabled={isRunning || !startTimestamp || !stopTimestamp}
+          >
+            POST API
+          </Button>
           <Button onClick={handleViewKintone}>View kintone</Button>
         </div>
       </RightSide>
