@@ -346,17 +346,17 @@ const App: React.FC = () => {
       <LeftSide>
         <Label>API Url</Label>
         <InputField
-          placeholder="url"
+          placeholder="url  *必須"
           value={apiUrl}
           onChange={(e) => setApiUrl(e.target.value)}
         />
         <Label>APP Id</Label>
         <InputField
-          placeholder="app"
+          placeholder="app  *必須"
           value={appId}
           onChange={(e) => setAppId(e.target.value)}
         />
-        <Label>User config</Label>
+        <Label>Create User</Label>
         <InputField
           placeholder="作成者.name"
           value={createUserName}
@@ -418,11 +418,11 @@ const App: React.FC = () => {
       <RightSide>
         <Label>API Headers</Label>
         <InputField
-          placeholder="X-Cybozu-API-Token"
+          placeholder="X-Cybozu-API-Token  *必須"
           value={headerToken}
           onChange={(e) => setHeaderToken(e.target.value)}
         />
-        <Label>Body</Label>
+        <Label>API Body</Label>
         <InputField
           placeholder="プロジェクトNo"
           value={projectNum}
