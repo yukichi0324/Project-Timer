@@ -382,8 +382,13 @@ const App: React.FC = () => {
           />
         </CircleContainer>
         <ButtonArea>
-          <Button onClick={startTimer}>Start</Button>
-          <Button onClick={isStopped ? resetTimer : stopTimer}>
+          <Button onClick={startTimer} disabled={isRunning}>
+            Start
+          </Button>
+          <Button
+            onClick={isStopped ? resetTimer : stopTimer}
+            disabled={!isRunning && !isStopped}
+          >
             {isStopped ? "Reset" : "Stop"}
           </Button>
         </ButtonArea>
@@ -401,7 +406,9 @@ const App: React.FC = () => {
               onChange={(e) => setInputDuration(e.target.value)}
               placeholder="分 単位"
             />
-            <Button onClick={handleDurationChange}>設定</Button>
+            <Button onClick={handleDurationChange} disabled={isRunning || isStopped}>
+              設定
+            </Button>
           </div>
         </CenterDisplay>
       </Center>
