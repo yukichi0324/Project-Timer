@@ -214,7 +214,7 @@ const App: React.FC = () => {
   const [appId, setAppId] = useState("3");
 
   const [createUserName, setCreateUserName] = useState("");
-  const [createUserCode, setCreateUserCode] = useState("");
+  const [createUserCode, setCreateUserCode] = useState("test");
 
   const [workDescription, setWorkDescription] = useState("");
 
