@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
@@ -121,6 +121,23 @@ const CenterDisplay = styled.div`
   margin-top: 20px;
 `;
 
+// Web Worker のスクリプトを文字列として定義
+const workerScript = `
+  self.onmessage = function(e) {
+    const duration = e.data;
+    let percentage = 0;
+    const interval = setInterval(() => {
+      percentage += 1;
+      if (percentage >= 100) {
+        clearInterval(interval);
+        self.postMessage(100);
+      } else {
+        self.postMessage(percentage);
+      }
+    }, duration);
+  };
+`;
+
 const App: React.FC = () => {
   const [percentage, setPercentage] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
@@ -135,6 +152,25 @@ const App: React.FC = () => {
   const progressRef = useRef<NodeJS.Timeout | null>(null);
   const [inputDuration, setInputDuration] = useState("1");
   const [duration, setDuration] = useState(60);
+
+  const workerRef = useRef<Worker | null>(null);
+
+  useEffect(() => {
+    // Web Worker の初期化
+    workerRef.current = new Worker(
+      URL.createObjectURL(new Blob([workerScript], { type: 'application/javascript' }))
+    );
+
+    // Worker からのメッセージを処理
+    workerRef.current.onmessage = (event) => {
+      setPercentage(event.data);
+    };
+
+    // コンポーネントのアンマウント時に Worker を終了
+    return () => {
+      workerRef.current?.terminate();
+    };
+  }, []);
 
   const handleDurationChange = () => {
     const newDuration = parseInt(inputDuration);
@@ -153,22 +189,16 @@ const App: React.FC = () => {
       setIsStopped(false);
       if (startTimestamp == null) {
         setStartTimestamp(new Date().toLocaleTimeString());
-      }else{
+      } else {
         setReStartTimestamp(new Date().toLocaleTimeString());
       }
+
+      // Web Worker を使用して進捗バーを管理
+      workerRef.current?.postMessage(duration * 10);
+
       timerRef.current = setInterval(() => {
         setElapsedTime((prev) => prev + 1);
       }, 1000);
-      progressRef.current = setInterval(() => {
-        setPercentage((prev) => {
-          if (prev < 100) {
-            return prev + 1;
-          } else {
-            clearInterval(progressRef.current as NodeJS.Timeout);
-            return prev;
-          }
-        });
-      }, duration * 10);
     }
   };
 
@@ -177,14 +207,14 @@ const App: React.FC = () => {
       setIsRunning(false);
       setIsStopped(true);
       setStopTimestamp(new Date().toLocaleTimeString());
+
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
-      if (progressRef.current) {
-        clearInterval(progressRef.current);
-        progressRef.current = null;
-      }
+      // Worker の進捗バー処理を停止
+      workerRef.current?.terminate();
+      workerRef.current = null;
     }
   };
 
