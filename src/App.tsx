@@ -172,16 +172,24 @@ const App: React.FC = () => {
   }, []);
 
   const handleDurationChange = () => {
-    const newDuration = parseInt(inputDuration);
-    if (!isNaN(newDuration) && newDuration > 0) {
-      setDuration(newDuration * 60);
-      resetTimer(); // 新しいdurationを設定後にタイマーをリセット
-    }
-    else{
-      setInputDuration("1");
+    // 入力が正の整数であるかを確認するための正規表現
+    const integerPattern = /^[1-9]\d*$/;
+  
+    if (integerPattern.test(inputDuration)) {
+      const newDuration = parseInt(inputDuration, 10);
+      if (Number.isInteger(newDuration) && newDuration > 0) {
+        setDuration(newDuration * 60);
+        resetTimer(); // 新しい duration を設定後にタイマーをリセット
+      } else {
+        toast.error("タイマー（分）は正の整数で設定してください");
+        setInputDuration("1"); // 無効な入力の場合はデフォルト値に戻す
+      }
+    } else {
+      toast.error("タイマー（分）は正の整数で設定してください");
+      setInputDuration("1"); // 無効な入力の場合はデフォルト値に戻す
     }
   };
-
+  
   const startTimer = () => {
     if (!isRunning) {
       setIsRunning(true);
