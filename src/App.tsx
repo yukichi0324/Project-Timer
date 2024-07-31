@@ -128,6 +128,7 @@ const App: React.FC = () => {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [startTimestamp, setStartTimestamp] = useState<string | null>(null);
+  const [reStartTimestamp, setReStartTimestamp] = useState<string | null>(null);
   const [stopTimestamp, setStopTimestamp] = useState<string | null>(null);
   const [isStopped, setIsStopped] = useState(false);
 
@@ -152,6 +153,8 @@ const App: React.FC = () => {
       setIsStopped(false);
       if (startTimestamp == null) {
         setStartTimestamp(new Date().toLocaleTimeString());
+      }else{
+        setReStartTimestamp(new Date().toLocaleTimeString());
       }
       timerRef.current = setInterval(() => {
         setElapsedTime((prev) => prev + 1);
@@ -198,6 +201,7 @@ const App: React.FC = () => {
     setElapsedTime(0);
     setPercentage(0);
     setStartTimestamp(null);
+    setReStartTimestamp(null);
     setStopTimestamp(null);
     setIsStopped(false);
   };
@@ -395,6 +399,9 @@ const App: React.FC = () => {
         <CenterDisplay>
           <TimestampDisplay>
             Start Time: {startTimestamp || "Not started yet"}
+          </TimestampDisplay>
+          <TimestampDisplay>
+            Re Start Time: {reStartTimestamp || "Not started yet"}
           </TimestampDisplay>
           <TimestampDisplay>
             Stop Time: {stopTimestamp || "Not stopped yet"}
