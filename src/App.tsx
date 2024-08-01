@@ -130,8 +130,12 @@ const workerScript = `
     const increment = 100 / duration; // 全体の進捗を秒単位で計算
     console.log("Increment per second:", increment);
 
+     // Worker のスレッドのユニークな識別子として、タイムスタンプを使ってみる
+    const workerID = Date.now();
+    
     const interval = setInterval(() => {
       percentage += increment;
+      console.log("workerID:", workerID);
       console.log("Current percentage:", percentage);
       if (percentage >= 100) {
         percentage = 100;
@@ -142,8 +146,6 @@ const workerScript = `
     }, 1000); // 1 秒ごとに進捗を更新
   };
 `;
-
-
 
 const App: React.FC = () => {
   const [percentage, setPercentage] = useState(0);
@@ -170,14 +172,14 @@ const App: React.FC = () => {
         new Blob([workerScript], { type: "application/javascript" })
       )
     );
-  
+
     // Worker からのメッセージを処理
     workerRef.current.onmessage = (event) => {
       setPercentage(event.data);
     };
-  
+
     setIsWorkerInitialized(true);
-  
+
     // コンポーネントのアンマウント時に Worker を終了
     return () => {
       workerRef.current?.terminate();
@@ -187,7 +189,7 @@ const App: React.FC = () => {
 
   const handleDurationChange = () => {
     const integerPattern = /^[1-9]\d*$/;
-  
+
     if (integerPattern.test(inputDuration)) {
       const newDuration = parseInt(inputDuration, 10);
       console.log("Parsed duration (minutes):", newDuration);
@@ -196,12 +198,15 @@ const App: React.FC = () => {
         console.log("Duration in seconds:", durationInSeconds);
         setDuration(durationInSeconds); // 分単位で設定し、秒単位に変換
         resetTimer(); // 新しい duration を設定後にタイマーをリセット
-  
+
         // Web Worker が初期化されているかどうかの確認
         if (isWorkerInitialized) {
           if (workerRef.current) {
             console.log("Posting message to worker.");
-            workerRef.current.postMessage({ action: "updateDuration", duration: durationInSeconds });
+            workerRef.current.postMessage({
+              action: "updateDuration",
+              duration: durationInSeconds,
+            });
           } else {
             console.error("Worker reference is null.");
           }
@@ -217,12 +222,13 @@ const App: React.FC = () => {
       setInputDuration("1"); // 無効な入力の場合はデフォルト値に戻す
     }
   };
+
   const startTimer = () => {
     if (!isRunning) {
       console.log("Starting timer...");
       setIsRunning(true);
       setIsStopped(false);
-  
+
       if (startTimestamp == null) {
         setStartTimestamp(new Date().toLocaleTimeString());
         console.log("Start timestamp set:", startTimestamp);
@@ -230,19 +236,19 @@ const App: React.FC = () => {
         setReStartTimestamp(new Date().toLocaleTimeString());
         console.log("Restart timestamp set:", reStartTimestamp);
       }
-  
+
       // Web Worker を使用して進捗バーを管理
       if (workerRef.current) {
         console.log("Posting duration to Web Worker:", duration);
         workerRef.current.postMessage(duration);
       }
-  
+
       // 既存のタイマーをクリアする
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null; // 明示的にタイマーをリセット
       }
-  
+
       // 新しいタイマーを設定する
       timerRef.current = setInterval(() => {
         setElapsedTime((prev) => {
@@ -253,25 +259,24 @@ const App: React.FC = () => {
       }, 1000);
     }
   };
-  
+
   const stopTimer = () => {
     if (isRunning) {
       setIsRunning(false);
       setIsStopped(true);
       setStopTimestamp(new Date().toLocaleTimeString());
-  
+
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null; // 明示的にタイマーをリセット
       }
-  
+
       // Worker の進捗バー処理を停止
       workerRef.current?.terminate();
       workerRef.current = null;
     }
   };
-  
-  
+
   const resetTimer = () => {
     setIsRunning(false);
     setElapsedTime(0);
@@ -280,26 +285,24 @@ const App: React.FC = () => {
     setReStartTimestamp(null);
     setStopTimestamp(null);
     setIsStopped(false);
-  
+
     // 既存の Web Worker を終了
     if (workerRef.current) {
       workerRef.current.terminate();
       workerRef.current = null;
     }
-  
+
     // Web Worker を再初期化
     workerRef.current = new Worker(
       URL.createObjectURL(
         new Blob([workerScript], { type: "application/javascript" })
       )
     );
-  
+
     workerRef.current.onmessage = (event) => {
       setPercentage(event.data);
     };
   };
-  
-
 
   const formatTime = (time: number) => {
     const getSeconds = `0${time % 60}`.slice(-2);
@@ -308,7 +311,6 @@ const App: React.FC = () => {
     const getHours = `0${Math.floor(time / 3600)}`.slice(-2);
     return `${getHours}:${getMinutes}:${getSeconds}`;
   };
-
 
   const [headerToken, setHeaderToken] = useState(
     "SAtdki3FM5f87zIUVNnd40S2wxrFYrgqaJ0uwu73"
@@ -504,9 +506,9 @@ const App: React.FC = () => {
           <TimestampDisplay>
             Start Time: {startTimestamp || "Not started yet"}
           </TimestampDisplay>
-          <TimestampDisplay>
+          {/* <TimestampDisplay>
             Re Start Time: {reStartTimestamp || "Not started yet"}
-          </TimestampDisplay>
+          </TimestampDisplay> */}
           <TimestampDisplay>
             Stop Time: {stopTimestamp || "Not stopped yet"}
           </TimestampDisplay>
