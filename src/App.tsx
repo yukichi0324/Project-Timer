@@ -123,19 +123,27 @@ const CenterDisplay = styled.div`
 // Web Worker のスクリプトを文字列として定義
 const workerScript = `
   self.onmessage = function(e) {
-    const duration = e.data;
+    const duration = e.data; // duration は秒数
+    console.log("Web Worker received duration:", duration);
+    
     let percentage = 0;
+    const increment = 100 / duration; // 全体の進捗を秒単位で計算
+    console.log("Increment per second:", increment);
+
     const interval = setInterval(() => {
-      percentage += 1;
+      percentage += increment;
+      console.log("Current percentage:", percentage);
       if (percentage >= 100) {
+        percentage = 100;
         clearInterval(interval);
-        self.postMessage(100);
-      } else {
-        self.postMessage(percentage);
+        console.log("Progress completed");
       }
-    }, duration);
+      self.postMessage(percentage);
+    }, 1000); // 1 秒ごとに進捗を更新
   };
 `;
+
+
 
 const App: React.FC = () => {
   const [percentage, setPercentage] = useState(0);
@@ -153,33 +161,53 @@ const App: React.FC = () => {
   const [duration, setDuration] = useState(60);
 
   const workerRef = useRef<Worker | null>(null);
+  const [isWorkerInitialized, setIsWorkerInitialized] = useState(false);
 
   useEffect(() => {
     // Web Worker の初期化
     workerRef.current = new Worker(
-      URL.createObjectURL(new Blob([workerScript], { type: 'application/javascript' }))
+      URL.createObjectURL(
+        new Blob([workerScript], { type: "application/javascript" })
+      )
     );
-
+  
     // Worker からのメッセージを処理
     workerRef.current.onmessage = (event) => {
       setPercentage(event.data);
     };
-
+  
+    setIsWorkerInitialized(true);
+  
     // コンポーネントのアンマウント時に Worker を終了
     return () => {
       workerRef.current?.terminate();
+      setIsWorkerInitialized(false);
     };
   }, []);
 
   const handleDurationChange = () => {
-    // 入力が正の整数であるかを確認するための正規表現
     const integerPattern = /^[1-9]\d*$/;
   
     if (integerPattern.test(inputDuration)) {
       const newDuration = parseInt(inputDuration, 10);
+      console.log("Parsed duration (minutes):", newDuration);
       if (Number.isInteger(newDuration) && newDuration > 0) {
-        setDuration(newDuration * 60);
+        const durationInSeconds = newDuration * 60;
+        console.log("Duration in seconds:", durationInSeconds);
+        setDuration(durationInSeconds); // 分単位で設定し、秒単位に変換
         resetTimer(); // 新しい duration を設定後にタイマーをリセット
+  
+        // Web Worker が初期化されているかどうかの確認
+        if (isWorkerInitialized) {
+          if (workerRef.current) {
+            console.log("Posting message to worker.");
+            workerRef.current.postMessage({ action: "updateDuration", duration: durationInSeconds });
+          } else {
+            console.error("Worker reference is null.");
+          }
+        } else {
+          console.error("Web Worker is not initialized.");
+        }
       } else {
         toast.error("タイマー（分）は正の整数で設定してください");
         setInputDuration("1"); // 無効な入力の場合はデフォルト値に戻す
@@ -189,41 +217,89 @@ const App: React.FC = () => {
       setInputDuration("1"); // 無効な入力の場合はデフォルト値に戻す
     }
   };
-  
   const startTimer = () => {
     if (!isRunning) {
+      console.log("Starting timer...");
       setIsRunning(true);
       setIsStopped(false);
+  
       if (startTimestamp == null) {
         setStartTimestamp(new Date().toLocaleTimeString());
+        console.log("Start timestamp set:", startTimestamp);
       } else {
         setReStartTimestamp(new Date().toLocaleTimeString());
+        console.log("Restart timestamp set:", reStartTimestamp);
       }
-
+  
       // Web Worker を使用して進捗バーを管理
-      workerRef.current?.postMessage(duration * 10);
-
+      if (workerRef.current) {
+        console.log("Posting duration to Web Worker:", duration);
+        workerRef.current.postMessage(duration);
+      }
+  
+      // 既存のタイマーをクリアする
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null; // 明示的にタイマーをリセット
+      }
+  
+      // 新しいタイマーを設定する
       timerRef.current = setInterval(() => {
-        setElapsedTime((prev) => prev + 1);
+        setElapsedTime((prev) => {
+          const newTime = prev + 1;
+          console.log("Elapsed time:", newTime);
+          return newTime;
+        });
       }, 1000);
     }
   };
-
+  
   const stopTimer = () => {
     if (isRunning) {
       setIsRunning(false);
       setIsStopped(true);
       setStopTimestamp(new Date().toLocaleTimeString());
-
+  
       if (timerRef.current) {
         clearInterval(timerRef.current);
-        timerRef.current = null;
+        timerRef.current = null; // 明示的にタイマーをリセット
       }
+  
       // Worker の進捗バー処理を停止
       workerRef.current?.terminate();
       workerRef.current = null;
     }
   };
+  
+  
+  const resetTimer = () => {
+    setIsRunning(false);
+    setElapsedTime(0);
+    setPercentage(0);
+    setStartTimestamp(null);
+    setReStartTimestamp(null);
+    setStopTimestamp(null);
+    setIsStopped(false);
+  
+    // 既存の Web Worker を終了
+    if (workerRef.current) {
+      workerRef.current.terminate();
+      workerRef.current = null;
+    }
+  
+    // Web Worker を再初期化
+    workerRef.current = new Worker(
+      URL.createObjectURL(
+        new Blob([workerScript], { type: "application/javascript" })
+      )
+    );
+  
+    workerRef.current.onmessage = (event) => {
+      setPercentage(event.data);
+    };
+  };
+  
+
 
   const formatTime = (time: number) => {
     const getSeconds = `0${time % 60}`.slice(-2);
@@ -233,15 +309,6 @@ const App: React.FC = () => {
     return `${getHours}:${getMinutes}:${getSeconds}`;
   };
 
-  const resetTimer = () => {
-    setIsRunning(false);
-    setElapsedTime(0);
-    setPercentage(0);
-    setStartTimestamp(null);
-    setReStartTimestamp(null);
-    setStopTimestamp(null);
-    setIsStopped(false);
-  };
 
   const [headerToken, setHeaderToken] = useState(
     "SAtdki3FM5f87zIUVNnd40S2wxrFYrgqaJ0uwu73"
